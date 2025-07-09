@@ -1,0 +1,7 @@
+{
+  "api_ip": "127.0.0.1",
+  "api_port": 80,
+  "api_path": "route_path",
+  "api_user": "api_user",
+  "api_password": "api_password"
+}

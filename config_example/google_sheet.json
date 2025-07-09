@@ -1,0 +1,12 @@
+{
+  "credentials_path": "service_account/config_path",
+  "spreadsheet_id": "spreadsheet_id",
+  "document_column": "B",
+  "registration_time_column": "K",
+  "writing_start_column": "J",
+  "writing_start_index": 9,
+  "writing_end_column": "U",
+  "writing_end_index": 21,
+  "offset_row": 3,
+  "partner": "partner"
+}

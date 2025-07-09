@@ -1,0 +1,8 @@
+{
+  "pg_url": "postgresql+asyncpg",
+  "pg_host": "localhost",
+  "pg_port": 5432,
+  "pg_db": "db_name",
+  "pg_user": "pg_user",
+  "pg_password": "pg_password"
+}

@@ -1,0 +1,11 @@
+{
+    "token": "bot_token",
+    "user_agree": "user_agree_link",
+    "log_dir": "logs",
+    "log_filename": "bot.log",
+    "qr_dir": "qr",
+    "stand_chat_ids": [
+        "12345678",
+        "12345678"
+    ]
+}

@@ -1,0 +1,8 @@
+{
+  "host": "localhost",
+  "port": 6379,
+  "storage_base": 0,
+  "throttling_base": 5,
+  "max_requests": 10,
+  "ignore_time": 60
+}

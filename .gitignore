@@ -208,3 +208,4 @@ marimo/_lsp/
 __marimo__/
 /src/alembic/versions/
 /config/
+/config_example/service_account/
