@@ -16,8 +16,8 @@ from src.bot.keyboards.menu import return_to_menu_kb
 # database
 from src.database.scripts.authorization import get_user
 # texts
-from src.bot.texts.authorization import *
-from src.bot.texts.common import get_no_callback_text
+from src.bot.translations.authorization import *
+from src.bot.translations.common import get_no_callback_text
 from src.utils.validation import DriverValidator
 
 router = Router()

@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.bot.texts.qr_code import cls_button_text, activate_button_text
+from src.bot.translations.qr_code import cls_button_text, activate_button_text
 
 
 def clear_history_kb(lang: str) -> InlineKeyboardMarkup:

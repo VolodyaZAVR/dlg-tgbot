@@ -1,8 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton, ReplyKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.bot.texts.menu import lang_button_text
-from src.bot.texts.qr_code import menu_button_text, edit_lang_button_text, no_code_button_text, has_code_button_text
+from src.bot.translations.menu import lang_button_text
+from src.bot.translations.qr_code import menu_button_text, edit_lang_button_text, no_code_button_text, has_code_button_text
 
 
 def lang_kb() -> InlineKeyboardMarkup:

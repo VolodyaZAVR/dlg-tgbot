@@ -17,8 +17,8 @@ from src.bot.keyboards.menu import return_to_menu_kb
 # database
 from src.database.scripts.registration import reg_user
 # text
-from src.bot.texts.authorization import *
-from src.bot.texts.registration import *
+from src.bot.translations.authorization import *
+from src.bot.translations.registration import *
 from src.utils.validation import DriverValidator
 
 router = Router()

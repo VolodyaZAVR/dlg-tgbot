@@ -2,10 +2,23 @@ import re
 import logging
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
+from typing import List, Dict, Any
 
-from src.utils.texts_utils import InputUtils
+from src.utils.texts_utils import InputUtils, format_partner, format_name
 
 logger = logging.getLogger("bot")
+
+
+class LanguageValidator:
+    """Класс для проверки языковых кодов."""
+    VALID_LANGUAGES = {'ru', 'en', 'kz', 'by', 'az', 'uz', 'tg', 'kg'}
+
+    @staticmethod
+    def validate_lang_code(lang_code: str) -> str:
+        """Проверяет корректность языкового кода."""
+        if lang_code not in LanguageValidator.VALID_LANGUAGES:
+            raise ValueError("Invalid language code.")
+        return lang_code
 
 
 class DriverValidator:
@@ -150,6 +163,49 @@ class DriverValidator:
             return False
 
     @staticmethod
+    def validate_license(selected_format: str, license_series: str, license_number: str) -> bool:
+        """Проверяет корректность серии и номера паспорта для выбранного формата."""
+        format_data = DriverValidator._passport_formats.get(selected_format)
+        if not format_data:
+            return False
+
+        series_pattern = format_data["series"]
+        number_pattern = format_data["number"]
+
+        try:
+            if not re.match(number_pattern, license_number):
+                return False
+
+            if series_pattern:
+                if not license_series or not re.match(series_pattern, license_series):
+                    return False
+
+            return True
+        except re.error as e:
+            logger.error(f"Validation licence regex error: {e}")
+            return False
+
+    @staticmethod
+    def validate_any_license(license_series: str, license_number: str) -> bool:
+        """Проверяет корректность серии и номера паспорта для любого формата."""
+        try:
+            for format_data in DriverValidator._passport_formats.values():
+                series_pattern = format_data["series"]
+                number_pattern = format_data["number"]
+
+                # Если формат не требует серии, пропускаем проверку серии
+                if series_pattern is None:
+                    if re.match(number_pattern, license_number):
+                        return True
+                else:
+                    if re.match(series_pattern, license_series) and re.match(number_pattern, license_number):
+                        return True
+
+        except Exception as e:
+            logger.error(f"Validation any format licence regex error: {e}")
+        return False
+
+    @staticmethod
     async def get_passport_form_msg(msg: Message, state: FSMContext):
         try:
             passport_series, passport_number = await InputUtils.split_licence_input(msg.text)
@@ -173,8 +229,10 @@ class VehicleValidator:
                "trailer": r'^[ABEIKMHOPCTX]\d{4}[ABEIKMHOPCTX]-\d$'},
         "en": {"vehicle": r'^\d{3}[A-Z]{3}$',
                "trailer": r'^[A-Z]{1,3}[\d]{1,4}[A-Z]{1,3}$'},
-        "kz": {"vehicle": r'^\d{3}[A-Z]{3}\d{2}$',
-               "trailer": r'^[A-Z]{3}\d{4}$'}
+        "kz": {"vehicle": r'^[A-Z]\d{3}[A-Z]{2}$|^\d{3}[A-Z]{2}\d{2}$|^\d{3}[A-Z]{3}\d{2}$',
+               "trailer": r'^[A-Z]{3}\d{4}$'},
+        "kg": {"vehicle": r'^\d{2,3}[A-Z]{2}$',
+               "trailer": r'^[A-Z]{2}\d{4}$'}
     }
 
     # Временное решение для прицепов - принимаем любую строку 3-10 символов
@@ -237,7 +295,25 @@ class VehicleValidator:
         except re.error as e:
             logger.error(f"Regex error in any vehicle validation: {e}")
             return False
-        
+
+    @staticmethod
+    def validate_vehicle(selected_format: str, vehicle_number: str) -> bool:
+        """Проверяет корректность номера транспортного средства для выбранного формата."""
+        try:
+            vehicle_pattern = VehicleValidator._formats.get(selected_format)
+            if not vehicle_pattern or not vehicle_pattern["vehicle"]:
+                return False
+
+            # Нормализуем номер если выбран белорусский формат
+            if selected_format == "by":
+                vehicle_number = VehicleValidator.__normalize_belarus_vehicle_number(vehicle_number)
+
+            if re.match(vehicle_pattern["vehicle"], vehicle_number):
+                return True
+        except re.error as e:
+            logger.error(f"Regex error in vehicle validation: {e}")
+        return False
+
     @staticmethod
     def validate_trailer_number(trailer_number: str) -> bool:
         """Проверяет корректность номера прицепа для любого формата."""
@@ -261,6 +337,30 @@ class VehicleValidator:
         except re.error as e:
             logger.error(f"Regex error in any trailer validation: {e}")
             return False
+
+    @staticmethod
+    def validate_trailer(selected_format: str, trailer_number: str) -> bool:
+        """Проверяет корректность номера прицепа для выбранного формата."""
+        original_number = trailer_number.upper()
+        try:
+            # Временное решение - используем общий шаблон вместо специфичного для формата
+            if re.match(VehicleValidator.TEMP_TRAILER_PATTERN, original_number, re.IGNORECASE):
+                return True
+
+            format_data = VehicleValidator._formats.get(selected_format)
+            if not format_data or not format_data["trailer"]:
+                return False
+
+            # Нормализуем номер прицепа если выбран казахстанский формат
+            if selected_format == "kz":
+                trailer_number = VehicleValidator.__normalize_kazakhstan_trailer_number(trailer_number)
+
+            trailer_pattern = format_data["trailer"]
+            if re.match(trailer_pattern, trailer_number):
+                return True
+        except re.error as e:
+            logger.error(f"Regex error in trailer validation: {e}")
+        return False
 
 
 class OrdersInfoValidator:
@@ -293,6 +393,39 @@ class OrdersInfoValidator:
         pattern = OrdersInfoValidator._partner_format
         return bool(re.match(pattern, value))
 
+    @staticmethod
+    def validate_orders_type(input_str: str) -> bool:
+        if input_str.lower() == "заявки":
+            return True
+        elif input_str.lower() == "контейнер":
+            return False
+        else:
+            raise ValueError(f'Некорректно указан тип заявки: {input_str}')
+
+    @staticmethod
+    def validate_job_type(input_str: str) -> str:
+        if input_str.lower() == "поступление":
+            return "Прием"
+        elif input_str.lower() == "возврат":
+            return "Отгрузка"
+        else:
+            raise ValueError(f'Некорректно указана цель визита: {input_str}')
+
+    @staticmethod
+    def validate_contact_point(input_str: str) -> str:
+        if input_str.lower() == "м19":
+            return "М19"
+        elif input_str.lower() == "м70":
+            return "М70"
+        elif input_str.lower() == "уткина_заводь":
+            return "Уткина Заводь"
+        elif input_str.lower() == "открытая_площадка":
+            return "Открытая площадка"
+        elif input_str.lower() == "к8":
+            return "K8"
+        else:
+            raise ValueError(f'Некорректно указана площадка: {input_str}')
+
 
 class KeyValidator:
     _request_type = "Запрос на аннулирование"
@@ -306,3 +439,176 @@ class KeyValidator:
     def validate_key(value: str) -> bool:
         pattern = KeyValidator._key_format
         return bool(re.match(pattern, value))
+
+
+class IDValidator:
+    """Класс для проверки ID пользователей."""
+    id_vocabulary = r'^\d{6,10}$'
+
+    @staticmethod
+    def is_correct_id(user_id: str) -> bool:
+        """Проверяет корректность telegram ID пользователя перед добавлением в конфиг."""
+        try:
+            if re.match(IDValidator.id_vocabulary, user_id):
+                user_id = int(user_id)  # cannot make it int than raise error
+                return True
+        except re.error as e:
+            logger.error(f"Regex error in is correct id: {e}")
+        except Exception as ex:
+            logger.error(f"Cannot make user ID to int. User ID: {user_id}. Error: {ex}")
+        return False
+
+
+# Bot-specific validation functions that use the validators above
+async def validate_vehicle_input(input_text: str, state: FSMContext):
+    """Валидация ввода информации о транспортном средстве для бота."""
+    lines = input_text.split(' ')
+    for i, line in enumerate(lines, 1):
+        if i == 1:
+            if VehicleValidator.validate_vehicle_number(line.strip().upper()):
+                await state.update_data(vehicle_number=line.strip().upper())
+            else:
+                raise ValueError(f"Некорректный ввод номера ТС: {line.strip().upper()}")
+        if i == 2:
+            if line.strip().lower() == "нет":
+                await state.update_data(trailer=False)
+                await state.update_data(trailer_number="")
+            elif VehicleValidator.validate_trailer_number(line.strip().upper()):
+                await state.update_data(trailer=True)
+                await state.update_data(trailer_number=line.strip().upper())
+            else:
+                raise ValueError(f"Некорректный ввод номера прицепа {line.strip().upper()}")
+        if i == 3:
+            match line.strip().lower():
+                case "больше":
+                    await state.update_data(trailer_weight="Да")
+                case "меньше":
+                    await state.update_data(trailer_weight="Нет")
+                case default:
+                    raise ValueError(f"Некорректный ввод класса грузоподъемности: {line.strip()}")
+    return await state.get_data()
+
+
+async def validate_orders_numbers(input_text: str, state: FSMContext, current_orders: List[Dict[str, Any]]):
+    """
+    Обрабатывает ввод номеров заявок, разделенных пробелами или переносами строк.
+    :param input_text: Строка с номерами заявок, разделенными пробелами или переносами строк.
+    :param state: Машина состояний.
+    :param current_orders: Текущий список заявок.
+    :return: Обновленные данные из машины состояний.
+    """
+    # Разделяем строку по пробелам и переносам строк
+    text = re.sub(r'\s+', " ", input_text.strip())
+    lines = re.split(r'[ \n]+', text.strip())  # Разбиваем по пробелам и переносам строк
+    orders = current_orders
+
+    for line in lines:
+        order_number = line.strip()
+        if not order_number:
+            continue
+
+        order = {
+            "Number": validate_order(order_number),
+            "Status": None,
+            "row_number": None
+        }
+        orders.append(order)
+
+    # Обновляем данные в состоянии
+    await state.update_data(orders=orders)
+    return await state.get_data()
+
+
+async def validate_orders(input_text: str, state: FSMContext):
+    """Валидация ввода заявок для бота."""
+    lines = input_text.split(' ')
+    orders = []
+    for i, line in enumerate(lines, 1):
+        if i == 1:
+            await state.update_data(contact_point=OrdersInfoValidator.validate_contact_point(line.strip()))
+        elif i == 2:
+            await state.update_data(job_type=OrdersInfoValidator.validate_job_type(line.strip()))
+        elif i == 3:
+            await state.update_data(partner=validate_partner(format_partner(line.strip())))
+        elif i == 4:
+            await state.update_data(use_orders=OrdersInfoValidator.validate_orders_type(line.strip()))
+        elif i > 4:
+            order = {
+                "Number": validate_order(line.strip()),
+                "Status": None,
+                "row_number": None
+            }
+            orders.append(order)
+            await state.update_data(orders=orders)
+    return await state.get_data()
+
+
+def validate_order(input_str: str) -> str:
+    """Валидация номера заявки."""
+    if OrdersInfoValidator.validate_order(input_str):
+        return input_str
+    else:
+        raise ValueError(f'Некорректно указана заявка: {input_str}')
+
+
+def validate_partner(input_str: str) -> str:
+    """Валидация контрагента."""
+    if OrdersInfoValidator.validate_partner(input_str):
+        return input_str
+    else:
+        raise ValueError(f'Некорректно указан контрагент: {input_str}')
+
+
+async def validate_user_data(input_text: str, state: FSMContext):
+    """Валидация персональных данных пользователя для бота."""
+    lines = input_text.split(' ')
+    for i, line in enumerate(lines, 1):
+        if i == 1:
+            if DriverValidator.validate_surname(format_name(line.strip())):
+                await state.update_data(surname=format_name(line.strip()))
+            else:
+                raise ValueError(f"Некорректно указана фамилия: {line.strip()}")
+        elif i == 2:
+            if DriverValidator.validate_name(format_name(line.strip())):
+                await state.update_data(name=format_name(line.strip()))
+            else:
+                raise ValueError(f"Некорректно указано имя: {line.strip()}")
+        elif i == 3:
+            if DriverValidator.validate_middle_name(format_name(line.strip())):
+                await state.update_data(middle_name=format_name(line.strip()))
+            else:
+                raise ValueError(f"Некорректно указано отчество: {line.strip()}")
+        elif i == 4:
+            if DriverValidator.validate_phone_number(line.strip()):
+                await state.update_data(number=line.strip())
+            else:
+                raise ValueError(f"Неверно введен номер телефона: {line.strip()}")
+    return await state.get_data()
+
+
+def format_user_data(input_text):
+    """Форматирование данных пользователя."""
+    lines = input_text.split('\n')
+    result = {}
+
+    for i, line in enumerate(lines, 1):
+        if i == 1:
+            result['name'] = format_name(line.strip())
+        elif i == 2:
+            result['surname'] = format_name(line.strip())
+        elif i == 3:
+            result['middle_name'] = format_name(line.strip())
+        elif i == 4:
+            result['number'] = line.strip()
+        elif i == 5:
+            result['licence_series'] = line.strip()
+        elif i == 6:
+            result['licence_number'] = line.strip()
+        else:
+            print(f"Пропуск неизвестной строки {i}")
+    return result
+
+
+def is_formated_number(number: str) -> bool:
+    """Проверка формата номера телефона."""
+    return DriverValidator.validate_phone_number(number)

@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.bot.states import Manager
 from src.utils.texts_utils import show_orders_with_false_status, is_any_false_status, format_name
-from src.utils.input_formats import validate_vehicle, validate_orders, validate_user_data, format_user_data, \
+from src.utils.validation import validate_vehicle_input, validate_orders, validate_user_data, format_user_data, \
     is_formated_number
 from input_format import RegistrationFormats, OrdersFormats, KeyFormats
 
@@ -33,12 +33,12 @@ from src.database.scripts.vehicle_info import update_vehicle_info_key
 from src.database.scripts.orders import add_fast_reg_orders, remove_fast_reg_orders
 
 # texts
-from src.bot.texts.registration import get_enter_name_text, get_incorrect_name_text, get_enter_surname_text, \
+from src.bot.translations.registration import get_enter_name_text, get_incorrect_name_text, get_enter_surname_text, \
     get_incorrect_surname_text, get_enter_middle_name_text, get_incorrect_middle_name_text, get_user_number_text, \
     get_incorrect_user_number_text
-from src.bot.texts.orders import get_incorrect_order_text
-from src.bot.texts.qr_code import incorrect_key_text, failed_generate_key_text
-from src.bot.texts.vehicle_info import show_contact_point, show_trailer_number, show_trailer_weight
+from src.bot.translations.orders import get_incorrect_order_text
+from src.bot.translations.qr_code import incorrect_key_text, failed_generate_key_text
+from src.bot.translations.vehicle_info import show_contact_point, show_trailer_number, show_trailer_weight
 
 from src.services.api_service import api_service
 from src.services.settings import settings
@@ -277,7 +277,7 @@ async def generate_key_admin(msg: Message, state: FSMContext, session: AsyncSess
 @manager_router.message(Manager.fast_vehicle)
 async def fast_generate_code(msg: Message, state: FSMContext, session: AsyncSession) -> None:
     try:
-        full_data = await validate_vehicle(msg.text, state)
+        full_data = await validate_vehicle_input(msg.text, state)
     except ValueError as ex:
         logger.error(f"Ошибка ввода информации о ТС {ex}", exc_info=True)
         await msg.answer(text=f"{ex}\nПовторите ввод ещё раз.")

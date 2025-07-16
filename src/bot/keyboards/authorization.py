@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.bot.texts.authorization import auth_kb_text, edit_licence_kb_text, apply_authorization_kb_text, \
+from src.bot.translations.authorization import auth_kb_text, edit_licence_kb_text, apply_authorization_kb_text, \
     deny_authorization_kb_text
 
 

@@ -1,10 +1,10 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.bot.texts.vehicle_info import *
-from src.bot.texts.authorization import go_back_kb_text
-from src.bot.texts.orders import edit_data_button_text
-from src.bot.texts.registration import edit_name_kb_text, edit_surname_kb_text, edit_middle_name_kb_text, edit_number_kb_text
+from src.bot.translations.vehicle_info import *
+from src.bot.translations.authorization import go_back_kb_text
+from src.bot.translations.orders import edit_data_button_text
+from src.bot.translations.registration import edit_name_kb_text, edit_surname_kb_text, edit_middle_name_kb_text, edit_number_kb_text
 
 
 def weight_kb(lang: str) -> InlineKeyboardMarkup:

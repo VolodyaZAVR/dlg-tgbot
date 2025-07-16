@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram.types import CallbackQuery
 from src.database.models import Registration
 
-from src.bot.texts.registration import get_user_already_reg_text
+from src.bot.translations.registration import get_user_already_reg_text
 
 
 async def reg_user(session: AsyncSession, call: CallbackQuery, data: dict, lang: str):

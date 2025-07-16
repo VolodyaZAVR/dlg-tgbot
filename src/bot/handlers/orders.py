@@ -10,7 +10,7 @@ from src.services.api_service import api_service
 from src.services.google_sheets_manager import sheets_manager
 from src.services.settings import settings
 
-from src.utils.input_formats import validate_orders_numbers, validate_order
+from src.utils.validation import validate_orders_numbers, validate_order
 from src.utils.texts_utils import show_response_error, is_any_false_status, get_orders_type, get_job_type, \
     get_contact_point
 # handlers
@@ -21,8 +21,8 @@ from src.bot.keyboards.menu import return_to_menu_kb
 # database
 from src.database.scripts.orders import add_fast_reg_orders
 # texts
-from src.bot.texts.orders import *
-from src.bot.texts.qr_code import contact_dispatcher_text
+from src.bot.translations.orders import *
+from src.bot.translations.qr_code import contact_dispatcher_text
 
 router = Router()
 router.message.filter(F.chat.type == "private")

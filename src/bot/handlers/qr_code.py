@@ -35,9 +35,9 @@ from src.database.scripts.vehicle_info import update_vehicle_info_key, delete_ve
     vehicle_info_check_existing_key, select_vehicle_info_by_key
 
 # texts
-from src.bot.texts.qr_code import *
-from src.bot.texts.menu import user_menu_text
-from src.bot.texts.authorization import get_format_messages
+from src.bot.translations.qr_code import *
+from src.bot.translations.menu import user_menu_text
+from src.bot.translations.authorization import get_format_messages
 
 
 router = Router()

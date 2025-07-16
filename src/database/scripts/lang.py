@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram.types import CallbackQuery
 
 from src.database.models import ChatLang
-from src.utils.input_formats import validate_lang_code
+from src.utils.validation import LanguageValidator
 from aiogram.types import TelegramObject
 
 
@@ -26,7 +26,7 @@ async def get_user_lang(session: AsyncSession, event: TelegramObject) -> str:
             return user_lang
         else:
             # Если пользователь существует, просто сообщаем его язык
-            return validate_lang_code(user.lang)
+            return LanguageValidator.validate_lang_code(user.lang)
 
 
 async def set_user_lang(call: CallbackQuery, session: AsyncSession) -> str:
@@ -37,7 +37,7 @@ async def set_user_lang(call: CallbackQuery, session: AsyncSession) -> str:
         await session.execute(
             update(ChatLang)
             .where(ChatLang.chat_id == chat_id)
-            .values(lang=validate_lang_code(lang_code))
+            .values(lang=LanguageValidator.validate_lang_code(lang_code))
         )
         await session.commit()
         return lang_code

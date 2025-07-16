@@ -1,8 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.bot.texts.authorization import edit_licence_kb_text, go_back_kb_text
-from src.bot.texts.registration import skip_middle_name_kb_text, accept_user_agree_kb_text, apply_registration_kb_text, \
+from src.bot.translations.authorization import edit_licence_kb_text, go_back_kb_text
+from src.bot.translations.registration import skip_middle_name_kb_text, accept_user_agree_kb_text, apply_registration_kb_text, \
     edit_reg_data_kb_text, edit_name_kb_text, edit_surname_kb_text, edit_middle_name_kb_text, edit_number_kb_text
 
 

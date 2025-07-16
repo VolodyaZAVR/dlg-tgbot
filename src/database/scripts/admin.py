@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram.types import Message
 from src.database.models import Registration, Orders, ChatLang, VehicleInfo
 from src.database.scripts.orders import get_scalar_subquery
-from src.bot.texts.registration import get_user_already_reg_text
+from src.bot.translations.registration import get_user_already_reg_text
 
 
 async def select_users_by_id(session: AsyncSession, driver_id):

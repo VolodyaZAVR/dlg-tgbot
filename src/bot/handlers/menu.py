@@ -13,8 +13,8 @@ from src.bot.keyboards.menu import lang_kb, finish_kb, return_to_menu_kb, menu_k
 # database
 from src.database.scripts.lang import set_user_lang, get_user_lang
 # texts
-from src.bot.texts.menu import *
-from src.bot.texts.authorization import get_format_messages
+from src.bot.translations.menu import *
+from src.bot.translations.authorization import get_format_messages
 
 router = Router()
 router.message.filter(F.chat.type == "private")

@@ -1,4 +1,4 @@
-from src.bot.texts.orders import show_contact_point, show_job_type, get_lang_no, get_lang_yes, get_lang_partner
+from src.bot.translations.orders import show_contact_point, show_job_type, get_lang_no, get_lang_yes, get_lang_partner
 from typing import Optional
 from src.utils.texts_utils import get_orders_in_list
 from src.bot.filters.manage_access import get_stand_chat_ids

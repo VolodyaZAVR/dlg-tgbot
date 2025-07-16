@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, Awaitable
 from aiogram.types import TelegramObject
 from src.database.models import ChatLang
 
-from src.utils.input_formats import validate_lang_code
+from src.utils.validation import LanguageValidator
 
 
 class LanguageMiddleware(BaseMiddleware):
@@ -40,7 +40,7 @@ class LanguageMiddleware(BaseMiddleware):
                     return None
                 # Добавляем lang в data, если пользователь найден
                 try:
-                    data['lang'] = validate_lang_code(user.lang)
+                    data['lang'] = LanguageValidator.validate_lang_code(user.lang)
                 except ValueError:
                     data['lang'] = 'ru'
             else:

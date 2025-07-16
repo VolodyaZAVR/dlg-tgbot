@@ -3,15 +3,15 @@ import logging
 
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import  Message, CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.bot.keyboards.qr_code import clear_history_kb
 from src.bot.states import VehicleInfo
 from input_format import RegistrationFormats
-from src.bot.texts.qr_code import contact_dispatcher_text
+from src.bot.translations.qr_code import contact_dispatcher_text
 from src.utils.texts_utils import get_weight, format_name
-from src.utils.input_formats import VehicleFormat, is_formated_number
+from src.utils.validation import VehicleValidator, is_formated_number
 
 # handlers
 from src.bot.handlers.qr_code import send_key_to_user, activate_key, generate_key
@@ -30,9 +30,9 @@ from src.bot.keyboards.vehicle_info import weight_kb, select_vehicle_format_kb, 
     create_code_kb, edit_vehicle_number_kb, edit_trailer_info_kb, edit_personal_data_kb, select_trailer_format_kb
 
 # texts #
-from src.bot.texts.vehicle_info import *
-from src.bot.texts.registration import *
-from src.bot.texts.common import get_no_callback_text
+from src.bot.translations.vehicle_info import *
+from src.bot.translations.registration import *
+from src.bot.translations.common import get_no_callback_text
 
 router = Router()
 router.message.filter(F.chat.type == "private")
@@ -73,7 +73,7 @@ async def set_vehicle_number(msg: Message, state: FSMContext, session: AsyncSess
         selected_format = data['select_format_vehicle']
         vehicle_number = msg.text.strip().upper()
 
-        if VehicleFormat.validate_vehicle(selected_format, vehicle_number):
+        if VehicleValidator.validate_vehicle(selected_format, vehicle_number):
             await state.update_data(vehicle_number=vehicle_number)
             await state.set_state(VehicleInfo.trailer)
             await msg.answer(text=get_lang_indicate_trailer(lang), reply_markup=get_yes_no_kb(lang))
@@ -122,7 +122,7 @@ async def set_trailer_number(msg: Message, state: FSMContext, session: AsyncSess
         selected_format = data['select_format_trailer']
         trailer_number = msg.text.strip().upper()
 
-        if VehicleFormat.validate_trailer(selected_format, trailer_number):
+        if VehicleValidator.validate_trailer(selected_format, trailer_number):
             await state.update_data(trailer_number=trailer_number)
             await state.set_state(VehicleInfo.vehicle_weight)
             await msg.answer(text=get_lang_load_capacity_class(lang), reply_markup=weight_kb(lang))
@@ -300,7 +300,7 @@ async def set_new_vehicle_number(msg: Message, state: FSMContext, session: Async
         selected_format = data['select_format_vehicle']
         vehicle_number = msg.text.strip().upper()
 
-        if VehicleFormat.validate_vehicle(selected_format, vehicle_number):
+        if VehicleValidator.validate_vehicle(selected_format, vehicle_number):
             await state.update_data(vehicle_number=vehicle_number)
             await state.set_state(VehicleInfo.vehicle_weight)
             await show_trailer_info(msg, state, session, lang, msg.from_user.id)
@@ -343,9 +343,9 @@ async def edit_trailer_format(call: CallbackQuery, state: FSMContext, session: A
 @router.callback_query(VehicleInfo.edit_format_trailer, F.data.startswith("trailer_"))
 async def set_new_trailer_format(call: CallbackQuery, state: FSMContext, session: AsyncSession, lang: str) -> None:
     try:
-        await state.set_state(VehicleInfo.edit_trailer_number)
         selected_format = call.data.split('_')[1]
         await state.update_data(select_format_trailer=selected_format)
+        await state.set_state(VehicleInfo.edit_trailer_number)
         await call.message.edit_text(text=ask_trailer_number(lang, selected_format))
 
     except Exception as e:
@@ -378,7 +378,7 @@ async def input_edit_trailer_num_correct(msg: Message, state: FSMContext, sessio
         selected_format = data['select_format_trailer']
         trailer_number = msg.text.strip().upper()
 
-        if VehicleFormat.validate_trailer(selected_format, trailer_number):
+        if VehicleValidator.validate_trailer(selected_format, trailer_number):
             await state.update_data(trailer_number=trailer_number)
             await state.set_state(VehicleInfo.vehicle_weight)
             await show_trailer_info(msg, state, session, lang, msg.from_user.id)

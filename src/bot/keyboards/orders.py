@@ -1,8 +1,8 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from src.bot.texts.orders import *
-from src.bot.texts.authorization import go_back_kb_text
+from src.bot.translations.orders import *
+from src.bot.translations.authorization import go_back_kb_text
 
 
 def get_contact_point_kb(lang: str) -> InlineKeyboardMarkup:

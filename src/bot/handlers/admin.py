@@ -29,14 +29,14 @@ from src.database.scripts.admin import select_users_by_surname, select_users_by_
 from src.database.scripts.orders import add_fast_reg_orders, remove_fast_reg_orders
 from src.database.scripts.vehicle_info import update_vehicle_info_key
 
-from src.bot.texts.registration import get_enter_name_text, get_incorrect_name_text, get_enter_surname_text, \
+from src.bot.translations.registration import get_enter_name_text, get_incorrect_name_text, get_enter_surname_text, \
     get_incorrect_surname_text, get_enter_middle_name_text, get_incorrect_middle_name_text, get_user_number_text, \
     get_incorrect_user_number_text
-from src.bot.texts.orders import get_incorrect_order_text
-from src.bot.texts.qr_code import incorrect_key_text, failed_generate_key_text
-from src.bot.texts.vehicle_info import show_contact_point, show_trailer_number, show_trailer_weight
+from src.bot.translations.orders import get_incorrect_order_text
+from src.bot.translations.qr_code import incorrect_key_text, failed_generate_key_text
+from src.bot.translations.vehicle_info import show_contact_point, show_trailer_number, show_trailer_weight
 
-from src.utils.input_formats import IDFormats, validate_vehicle, validate_orders, validate_user_data, format_user_data, \
+from src.utils.validation import IDValidator, validate_vehicle_input, validate_orders, validate_user_data, format_user_data, \
     is_formated_number
 from src.services.api_service import api_service
 from src.services.settings import settings
@@ -270,7 +270,7 @@ async def generate_key_admin(msg: Message, state: FSMContext, session: AsyncSess
 @admin_router.message(Admin.fast_vehicle)
 async def fast_generate_code(msg: Message, state: FSMContext, session: AsyncSession) -> None:
     try:
-        full_data = await validate_vehicle(msg.text, state)
+        full_data = await validate_vehicle_input(msg.text, state)
     except ValueError as ex:
         logger.error(f"Ошибка ввода информации о ТС {ex}", exc_info=True)
         await msg.answer(text=f"{ex}\nПовторите ввод ещё раз.")
@@ -876,7 +876,7 @@ async def ask_id_to_remove_manager(call: CallbackQuery, state: FSMContext):
 async def add_new_stand(msg: Message, state: FSMContext):
     stand_id = msg.text.strip()
 
-    if IDFormats.is_correct_id(stand_id):
+    if IDValidator.is_correct_id(stand_id):
         try:
             settings.add_stand(stand_id)
             await msg.answer(text=f"Успешно добавлена стойка с ID {stand_id}", reply_markup=manage_stands_kb())
@@ -893,7 +893,7 @@ async def add_new_stand(msg: Message, state: FSMContext):
 async def remove_stand(msg: Message, state: FSMContext):
     stand_id = msg.text.strip()
 
-    if IDFormats.is_correct_id(stand_id):
+    if IDValidator.is_correct_id(stand_id):
         try:
             settings.remove_stand(stand_id)
             await msg.answer(text=f"Успешно удалена стойка с ID {stand_id}", reply_markup=manage_stands_kb())
@@ -910,7 +910,7 @@ async def remove_stand(msg: Message, state: FSMContext):
 async def add_new_admin(msg: Message, state: FSMContext):
     admin_id = msg.text.strip()
 
-    if IDFormats.is_correct_id(admin_id):
+    if IDValidator.is_correct_id(admin_id):
         try:
             settings.add_admin(admin_id)
             await msg.answer(text=f"Успешно добавлен администратор с ID {admin_id}", reply_markup=manage_admins_kb())
@@ -927,7 +927,7 @@ async def add_new_admin(msg: Message, state: FSMContext):
 async def remove_admin(msg: Message, state: FSMContext):
     admin_id = msg.text.strip()
 
-    if IDFormats.is_correct_id(admin_id):
+    if IDValidator.is_correct_id(admin_id):
         try:
             if admin_id == settings.main_admin:
                 await msg.answer(text=f"Нельзя удалять главного админа", reply_markup=manage_access_kb())
@@ -947,7 +947,7 @@ async def remove_admin(msg: Message, state: FSMContext):
 async def add_new_manager(msg: Message, state: FSMContext):
     manager_id = msg.text.strip()
 
-    if IDFormats.is_correct_id(manager_id):
+    if IDValidator.is_correct_id(manager_id):
         try:
             settings.add_manager(manager_id)
             await msg.answer(text=f"Успешно добавлен менеджер с ID {manager_id}", reply_markup=manage_managers_kb())
@@ -964,7 +964,7 @@ async def add_new_manager(msg: Message, state: FSMContext):
 async def remove_manager(msg: Message, state: FSMContext):
     manager_id = msg.text.strip()
 
-    if IDFormats.is_correct_id(manager_id):
+    if IDValidator.is_correct_id(manager_id):
         try:
             settings.remove_manager(manager_id)
             await msg.answer(text=f"Успешно удален менеджер с ID {manager_id}", reply_markup=manage_managers_kb())

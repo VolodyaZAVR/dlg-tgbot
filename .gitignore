@@ -209,3 +209,4 @@ __marimo__/
 /src/alembic/versions/
 /config/
 /config_example/service_account/
+src/api_v1/test.py
