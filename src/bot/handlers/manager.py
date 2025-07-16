@@ -11,7 +11,7 @@ from src.bot.states import Manager
 from src.utils.texts_utils import show_orders_with_false_status, is_any_false_status, format_name
 from src.utils.validation import validate_vehicle_input, validate_orders, validate_user_data, format_user_data, \
     is_formated_number
-from input_format import RegistrationFormats, OrdersFormats, KeyFormats
+from src.utils.input_formats import RegistrationFormats, OrdersFormats, KeyFormats
 
 # handlers
 from src.bot.handlers.menu import back_to_menu

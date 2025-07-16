@@ -4,12 +4,11 @@ from typing import List, Dict, Any
 
 from aiogram.fsm.context import FSMContext
 
-from input_format import OrdersFormats, PartnersFormats, RegistrationFormats, NumbersFormats
 from src.utils.texts_utils import format_partner, format_name
 from src.utils.validation import (
-    LanguageValidator, DriverValidator, VehicleValidator, 
+    LanguageValidator, DriverValidator, VehicleValidator,
     OrdersInfoValidator, KeyValidator, IDValidator,
-    validate_vehicle_input, validate_orders_numbers, validate_orders, 
+    validate_vehicle_input, validate_orders_numbers, validate_orders,
     validate_user_data, format_user_data, is_formated_number
 )
 
@@ -24,7 +23,7 @@ def validate_lang_code(lang_code: str):
 # Legacy classes for backward compatibility - these now use the validators from validation.py
 class AuthorizationFormat:
     """Legacy class - use DriverValidator instead."""
-    
+
     @staticmethod
     def validate_license(selected_format: str, license_series: str, license_number: str) -> bool:
         return DriverValidator.validate_license(selected_format, license_series, license_number)
@@ -36,7 +35,7 @@ class AuthorizationFormat:
 
 class PersonalDataFormat:
     """Legacy class - use DriverValidator instead."""
-    
+
     @staticmethod
     def validate(field: str, value: str) -> bool:
         if field == "name":
@@ -53,7 +52,7 @@ class PersonalDataFormat:
 
 class ApplicationFormat:
     """Legacy class - use OrdersInfoValidator instead."""
-    
+
     @staticmethod
     def validate(field: str, value: str) -> bool:
         if field == "order":
@@ -68,7 +67,7 @@ class ApplicationFormat:
 
 class VehicleFormat:
     """Legacy class - use VehicleValidator instead."""
-    
+
     @staticmethod
     def validate_vehicle(selected_format: str, vehicle_number: str) -> bool:
         return VehicleValidator.validate_vehicle(selected_format, vehicle_number)
@@ -88,7 +87,7 @@ class VehicleFormat:
 
 class IDFormats:
     """Legacy class - use IDValidator instead."""
-    
+
     @staticmethod
     def is_correct_id(user_id: str) -> bool:
         return IDValidator.is_correct_id(user_id)
@@ -154,3 +153,58 @@ def format_user_data(input_text):
 def is_formated_number(number: str) -> bool:
     """Legacy function - use is_formated_number from validation.py instead."""
     return is_formated_number(number)
+
+
+"""Legacy classes - need to use classes from validation.py instead."""
+
+
+class RegistrationFormats:
+    name = r'^[А-ЯЁа-яё]\w{2,24}$'
+    surname = r'^[А-ЯЁа-яё]\w{2,24}(?:-[А-ЯЁа-яё]\w{2,24})?$'
+    middle_name = r'^([А-ЯЁа-яё]\w{2,24})?$'
+
+    def validate_name(self, name: str):
+        try:
+            if re.match(self.name, name):
+                return name
+        except re.error as e:
+            logging.error(f"Regex error: {e}")
+
+        raise ValueError(f"Имя введено неверно: {name}")
+
+    def validate_surname(self, surname: str):
+        try:
+            if re.match(self.surname, surname):
+                return surname
+        except re.error as e:
+            logging.error(f"Regex error: {e}")
+
+        raise ValueError(f"Фамилия введена неверно: {surname}")
+
+    def validate_middle_name(self, middle_name: str):
+        try:
+            if re.match(self.middle_name, middle_name) or middle_name == "":
+                return middle_name
+        except re.error as e:
+            logging.error(f"Regex error: {e}")
+
+        raise ValueError(f"Отчество введено неверно: {middle_name}")
+
+
+class NumbersFormats:
+    format1 = r'^[+][7]\d\d\d\d\d\d\d\d\d\d$'
+    format2 = r'^[+][3][7][2]\d\d\d\d\d\d\d\d$'
+    format3 = r'^[+][3][7][5]\d\d\d\d\d\d\d\d$'
+    format4 = r'^[+][9][9][6]\d\d\d\d\d\d\d\d\d$'
+
+
+class OrdersFormats:
+    order = r'^[A-Za-zА-Яа-я0-9_№#-\\/\s]{1,60}$'
+
+
+class PartnersFormats:
+    partner = r'^[A-Za-zА-Яа-я0-9-\s]{1,50}$'
+
+
+class KeyFormats:
+    key = r'^\d\d\d\d\d\d$'

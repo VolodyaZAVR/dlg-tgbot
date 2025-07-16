@@ -18,7 +18,7 @@ from src.services.settings import settings
 from src.bot.states import QRcode, Authorization
 from src.utils.texts_utils import show_response_error
 from src.bot.filters.manage_access import get_stand_chat_ids
-from input_format import KeyFormats
+from src.utils.input_formats import KeyFormats
 
 # handlers
 from src.bot.handlers.menu import back_to_menu

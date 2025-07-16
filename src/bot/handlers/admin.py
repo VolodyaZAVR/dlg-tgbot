@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.bot.states import Admin
 from src.utils.texts_utils import show_user_status, show_orders_with_false_status, is_any_false_status, format_name
-from input_format import RegistrationFormats, OrdersFormats, KeyFormats
+from src.utils.input_formats import RegistrationFormats, OrdersFormats, KeyFormats
 
 from src.bot.handlers.menu import back_to_menu
 from src.bot.handlers.qr_code import generate_unique_6_digit_key

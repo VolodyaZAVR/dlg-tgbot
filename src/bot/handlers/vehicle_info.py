@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.bot.keyboards.qr_code import clear_history_kb
 from src.bot.states import VehicleInfo
-from input_format import RegistrationFormats
+from src.utils.input_formats import RegistrationFormats
 from src.bot.translations.qr_code import contact_dispatcher_text
 from src.utils.texts_utils import get_weight, format_name
 from src.utils.validation import VehicleValidator, is_formated_number
