@@ -89,6 +89,23 @@ def ask_format_kz(lang: str) -> str:
         return "Нишонаҳои қозоғистонӣ"
 
 
+def ask_format_kg(lang: str) -> str:
+    if lang == "ru":
+        return "Киргизские номера"
+    elif lang == "en":
+        return "Kyrgyzstani license plates"
+    elif lang == "kz":
+        return "Қырғызстандық нөмірлер"
+    elif lang == "by":
+        return "Кіргізскія нумары"
+    elif lang == "az":
+        return "Qırğızıstanlıq nömrələr"
+    elif lang == "uz":
+        return "Qirg'iziston nomerlari"
+    elif lang == "tg":
+        return "Нишонаҳои қирғизистонӣ"
+
+
 def get_vehicle_number_example(select_format: str) -> str:
     match select_format:
         case "ru":

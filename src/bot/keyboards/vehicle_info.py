@@ -71,6 +71,7 @@ def select_vehicle_format_kb(lang: str) -> InlineKeyboardMarkup:
     kb.row(InlineKeyboardButton(text=ask_format_by(lang), callback_data='vehicle_by'))
     kb.row(InlineKeyboardButton(text=ask_format_eu(lang), callback_data='vehicle_en'))
     kb.row(InlineKeyboardButton(text=ask_format_kz(lang), callback_data='vehicle_kz'))
+    kb.row(InlineKeyboardButton(text=ask_format_kg(lang), callback_data='vehicle_kg'))
     return kb.as_markup(resize_keyboard=True)
 
 
@@ -80,4 +81,5 @@ def select_trailer_format_kb(lang: str) -> InlineKeyboardMarkup:
     kb.row(InlineKeyboardButton(text=ask_format_by(lang), callback_data='trailer_by'))
     kb.row(InlineKeyboardButton(text=ask_format_eu(lang), callback_data='trailer_en'))
     kb.row(InlineKeyboardButton(text=ask_format_kz(lang), callback_data='trailer_kz'))
+    kb.row(InlineKeyboardButton(text=ask_format_kg(lang), callback_data='vehicle_kg'))
     return kb.as_markup(resize_keyboard=True)
