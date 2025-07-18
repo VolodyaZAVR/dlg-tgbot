@@ -7,8 +7,8 @@ async def outer_reg_add_user(session: AsyncSession, data: dict):
     async with session.begin():
         result = await session.execute(
             select(Registration).where(
-                Registration.licence_series == data.get('passport_series'),
-                Registration.licence_number == data.get('passport_number')
+                Registration.licence_series == data.get('licence_series'),
+                Registration.licence_number == data.get('licence_number')
             )
         )
         user = result.scalars().one_or_none()
@@ -23,8 +23,8 @@ async def outer_reg_add_user(session: AsyncSession, data: dict):
                 surname=data.get('surname'),
                 middle_name=data.get('middle_name'),
                 number=data.get('number'),
-                licence_series=data.get('passport_series'),
-                licence_number=data.get('passport_number')
+                licence_series=data.get('licence_series'),
+                licence_number=data.get('licence_number')
             )
             session.add(obj)
             await session.commit()
@@ -34,8 +34,8 @@ async def outer_reg_add_user(session: AsyncSession, data: dict):
 async def outer_reg_delete_user(session: AsyncSession, data: dict):
     async with session.begin():
         query = delete(Registration).where(
-            Registration.licence_series == data.get('passport_series'),
-            Registration.licence_number == data.get('passport_number')
+            Registration.licence_series == data.get('licence_series'),
+            Registration.licence_number == data.get('licence_number')
         )
         result = await session.execute(query)
         deleted_count = result.rowcount

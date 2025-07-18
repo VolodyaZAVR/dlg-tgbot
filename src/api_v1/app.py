@@ -96,7 +96,7 @@ async def registration_handler(request: Request,
         for order in api_response.get("payload", []):
             number = order.get("Number")
             status = order.get("Status")
-            updated_payload.append({"Number": number, "Status": status})
+            updated_payload.append({"Number": number, "Status": status, "row_number": None})
 
             if status is False:
                 error_orders.append(number)
